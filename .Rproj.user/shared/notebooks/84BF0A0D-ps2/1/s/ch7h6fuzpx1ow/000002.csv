@@ -1,0 +1,6 @@
+"0","rating_summary_d = rating_hyp_long_d %>% "
+"0","  group_by(ConfrontationalGame,Emotion) %>%"
+"0","  summarize(MeanRating = mean(Rating, na.rm=T))"
+"1","`summarise()` has grouped output by 'ConfrontationalGame'. You can override using the `.groups` argument.
+"
+"0","  ## your code here"

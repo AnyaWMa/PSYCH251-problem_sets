@@ -1,0 +1,4 @@
+"0","filtered_d = d %>% "
+"0","  filter(is.na(DoNotUse))"
+"0",""
+"0","head(filtered_d)"

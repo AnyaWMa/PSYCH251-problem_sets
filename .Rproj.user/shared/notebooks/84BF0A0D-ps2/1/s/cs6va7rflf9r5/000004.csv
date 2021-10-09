@@ -1,0 +1,6 @@
+"0","rating_hyp_long_d = rating_hyp_long_d %>%"
+"0","  mutate("
+"0","    IsRecall = grepl(""Friends|Strangers"", Measurement),## Your code here"
+"0","  )"
+"0",""
+"0","#head(rating_hyp_long_d)"

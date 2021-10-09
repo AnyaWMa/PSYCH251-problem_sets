@@ -1,0 +1,6 @@
+"0","performance_diff_summary_d = performance_diff_d %>%"
+"0","  group_by(ConfrontationalGame,MusicCondition) %>%"
+"0","  summarize(MeanImprovementScore = mean(ImprovementScore, na.rm=T))"
+"1","`summarise()` has grouped output by 'ConfrontationalGame'. You can override using the `.groups` argument.
+"
+"0","  ## Your code here"
