@@ -35,6 +35,8 @@ library(tidyverse) # for data munging
 library(knitr) # for kable table formating
 library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files
 library(readxl) # import excel files
+library(dplyr)
+library(janitor)
 
 # #optional packages:
 # library(broom)
@@ -51,7 +53,21 @@ d <- read_sav('data/Empathy Gap Study 1 data.sav')
 # Step 3: Tidy data
 
 ```{r}
+new_d <- d[, c('ID', 'condition', 'exchangeinfo')]
+new_d
+```
 
+
+```{r}
+# hypothetical condition (0)
+new_condition_0 <- new_d %>% 
+  filter(condition== 0)
+```
+
+
+```{r}
+new_condition_1 <- new_d %>% 
+  filter(condition== 1)
 ```
 
 # Step 4: Run analysis
@@ -62,7 +78,15 @@ d <- read_sav('data/Empathy Gap Study 1 data.sav')
 
 ```{r}
 # reproduce the above results here
+# In the hypothetical condition, 10 out of 61 participants chose to exchange info. 
+new_condition_0
+new_condition_0 %>% count(exchangeinfo)
+```
 
+
+```{r}
+# In the real condition, 21 out of 71 participants chose to exchange info. 
+new_condition_1 %>% count(exchangeinfo)
 ```
 
 ## Inferential statistics
@@ -71,21 +95,28 @@ d <- read_sav('data/Empathy Gap Study 1 data.sav')
 
 ```{r}
 # reproduce the above results here
+new_d_for_test <-d  %>%
+  tabyl(exchangeinfo, condition)
+new_d_for_test
+```
 
+
+```{r}
+chisq.test(new_d_for_test)
 ```
 
 # Step 5: Reflection
 
 Were you able to reproduce the results you attempted to reproduce? If not, what part(s) were you unable to reproduce?
 
-> ANSWER HERE
+> I could not reproduce the Chi-squared test (but maybe I used the test wrong). 
 
 How difficult was it to reproduce your results? 
 
-> ANSWER HERE
+> I think this study was not difficulty. 
 
 What aspects made it difficult? What aspects made it easy?
 
-> ANSWER HERE
+> I was confused by the data coding. For example, I could not figure out whether condition = 0 was hypothetical or real condition untill I finished counting. 
 
 

@@ -37,6 +37,7 @@ library(tidyverse) # for data munging
 library(knitr) # for kable table formating
 library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files
 library(readxl) # import excel files
+library(rstatix)
 
 # #optional packages/functions:
 # library(afex) # anova functions
@@ -56,7 +57,17 @@ d <- read_excel(data_path, sheet=3)
 # Step 3: Tidy data
 
 ```{r}
+d = rename(d, Agreement = "Agreement (0=complete disagreement; 5=complete agreement)")
+```
 
+
+```{r}
+is_empty(d)
+```
+
+
+```{r}
+colnames(d)
 ```
 
 # Step 4: Run analysis
@@ -64,7 +75,29 @@ d <- read_excel(data_path, sheet=3)
 ## Pre-processing
 
 ```{r}
+tidy_d =d %>% 
+  group_by(participant, group, subscale) %>% 
+  summarise(Mean_participant_rating = mean(Agreement)) 
+tidy_d
+```
 
+
+```{r}
+nrow(tidy_d)
+```
+
+
+```{r}
+summary_d = d %>%
+  group_by(group, subscale)  %>%
+summarize(Rating = mean(Agreement), sem = sd(Agreement)/sqrt(length(Agreement))) 
+
+summary_d
+```
+
+```{r}
+level_order <- factor(summary_d$group, level = c('young Spaniard', 'Moroccan'))
+scale_order <- factor(summary_d$subscale, level = c('PAST', 'FUTURE'))
 ```
 
 ## Descriptive statistics
@@ -72,6 +105,12 @@ d <- read_excel(data_path, sheet=3)
 Try to recreate Figure 2 (fig2.png, also included in the same folder as this Rmd file):
 
 ```{r}
+p<-ggplot(data=summary_d, aes(x=level_order, y=Rating, fill = scale_order)) +
+  geom_bar(position="dodge", stat="identity",colour="black", # Use black outlines,
+             size=.1) + 
+  geom_errorbar(aes(ymin=Rating-sem, ymax=Rating+sem),width=.1,position=position_dodge(.9)) + 
+  ylim(0, 4.0)
+p
 
 ```
 
@@ -81,6 +120,7 @@ Try to recreate Figure 2 (fig2.png, also included in the same folder as this Rmd
 
 ```{r}
 # reproduce the above results here
+d %>% anova_test(Agreement ~ group *  subscale)
 
 ```
 
@@ -88,26 +128,26 @@ Try to recreate Figure 2 (fig2.png, also included in the same folder as this Rmd
 
 ```{r}
 # reproduce the above results here
-
+t.test(Mean_participant_rating ~ group, data = filter(tidy_d, subscale == "PAST") )
 ```
 
 > and Spaniards showed greater agreement with future-focused statements than Moroccans did, t(78) = −3.32, p = .001.(de la Fuente et al., 2014, p. 1685)
 
 ```{r}
 # reproduce the above results here
-
+t.test(Mean_participant_rating ~ group, data = filter(tidy_d, subscale == "FUTURE") )
 ```
 
 # Step 5: Reflection
 
 Were you able to reproduce the results you attempted to reproduce? If not, what part(s) were you unable to reproduce?
 
-> ANSWER HERE
+> I was able to reproduce the descriptive stats, but not the inferential stats. 
 
 How difficult was it to reproduce your results? 
 
-> ANSWER HERE
+> Medium difficult. 
 
 What aspects made it difficult? What aspects made it easy?
 
-> ANSWER HERE
+> I think the ANOVA part was difficult because I was not sure which specific setting I should use. And I was also unsure which t-test I should use. 
