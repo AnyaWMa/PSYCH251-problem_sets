@@ -93,6 +93,8 @@ new_condition_1 %>% count(exchangeinfo)
 
 > A chi-square test of independence indicated that participants were significantly less likely to reject the unattractive potential date in the real condition compared with the hypothetical condition, X^2(1, N = 132) = 6.77, p = .009.
 
+Hint: if you are using the function chisq.test(), make sure to set the continuity correction to false ("correct = FALSE") since sample size is greater than 20. 
+
 ```{r}
 # reproduce the above results here
 new_d_for_test <-d  %>%
