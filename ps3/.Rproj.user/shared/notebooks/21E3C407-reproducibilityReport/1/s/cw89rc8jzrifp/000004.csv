@@ -1,0 +1,28 @@
+"0","library(tidyverse) # for data munging"
+"0","library(knitr) # for kable table formating"
+"0","library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files"
+"0","library(readxl) # import excel files"
+"0","library(rstatix)"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"2","
+Attaching package: ‘rstatix’
+
+"
+"2","The following object is masked from ‘package:janitor’:
+
+    make_clean_names
+
+"
+"2","The following object is masked from ‘package:stats’:
+
+    filter
+
+"
+"0","# #optional packages/functions:"
+"0","# library(afex) # anova functions"
+"0","# library(ez) # anova functions 2"
+"0","# library(scales) # for plotting"
+"0","# std.err <- function(x) sd(x)/sqrt(length(x)) # standard error"

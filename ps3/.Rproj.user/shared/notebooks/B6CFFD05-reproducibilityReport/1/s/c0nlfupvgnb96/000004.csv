@@ -1,0 +1,2 @@
+"0","new_d <- d[, c('ID', 'condition', 'exchangeinfo')]"
+"0","new_d"

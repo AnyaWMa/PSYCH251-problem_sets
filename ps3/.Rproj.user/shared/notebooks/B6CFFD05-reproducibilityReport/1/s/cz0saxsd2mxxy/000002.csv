@@ -1,0 +1,2 @@
+"0","new_condition_1 <- new_d %>% "
+"0","  filter(condition== 1)"

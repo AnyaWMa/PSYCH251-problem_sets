@@ -1,0 +1,18 @@
+"0","library(tidyverse) # for data munging"
+"0","library(knitr) # for kable table formating"
+"0","library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files"
+"0","library(readxl) # import excel files"
+"0","library(dplyr)"
+"0","library(janitor)"
+"2","
+Attaching package: ‘janitor’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    chisq.test, fisher.test
+
+"
+"0","# #optional packages:"
+"0","# library(broom)"
+"0","# library(labelled)# converts SPSS's labelled to R's factor "

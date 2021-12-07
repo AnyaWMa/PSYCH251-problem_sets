@@ -1,0 +1,6 @@
+"0","tidy_d =d %>% "
+"0","  group_by(participant, group, subscale) %>% "
+"0","  summarise(Mean_participant_rating = mean(Agreement)) "
+"1","`summarise()` has grouped output by 'participant', 'group'. You can override using the `.groups` argument.
+"
+"0","tidy_d"

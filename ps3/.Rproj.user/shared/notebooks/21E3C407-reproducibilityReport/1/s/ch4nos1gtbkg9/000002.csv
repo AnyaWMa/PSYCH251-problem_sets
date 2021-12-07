@@ -1,0 +1,6 @@
+"0","summary_d = d %>%"
+"0","  group_by(group, subscale)  %>%"
+"0","summarize(Rating = mean(Agreement), sem = sd(Agreement)/sqrt(length(Agreement))) "
+"1","`summarise()` has grouped output by 'group'. You can override using the `.groups` argument.
+"
+"0","summary_d"

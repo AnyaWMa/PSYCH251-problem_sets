@@ -1,0 +1,7 @@
+"0","p<-ggplot(data=summary_d, aes(x=level_order, y=Rating, fill = scale_order)) +"
+"0","  geom_bar(position=""dodge"", stat=""identity"",colour=""black"", # Use black outlines,"
+"0","             size=.1) + "
+"0","  geom_errorbar(aes(ymin=Rating-sem, ymax=Rating+sem),width=.1,position=position_dodge(.9)) + "
+"0","  ylim(0, 4.0)"
+"0","p"
+"0",""
