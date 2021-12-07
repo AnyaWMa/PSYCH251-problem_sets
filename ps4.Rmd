@@ -11,6 +11,25 @@ This is problem set #4, in which we want you to integrate your knowledge of data
 
 For ease of reading, please separate your answers from our text by marking our text with the `>` character (indicating quotes). 
 
+```{r, message=FALSE, warning = FALSE}
+#### Load Relevant Libraries and Functions
+library(data.table)
+library(readr)
+library(printr)
+library(readr)
+library(psych)
+library(tidyr)
+library(ggplot2)
+library(GGally)
+library(lmerTest)
+library(dplyr)
+library(plyr)
+library(stringr)
+library(rstatix) 
+library(hablar)
+library(cowplot)
+```
+
 # Part 1: ggplot practice
 
 This part is a warmup, it should be relatively straightforward `ggplot2` practice.
@@ -24,21 +43,54 @@ fvs <- read_csv("data/FVS2011-hands.csv")
 First, use `ggplot` to plot a histogram of the ages of children in the study. NOTE: this is a repeated measures design, so you can't just take a histogram of every measurement. 
 
 ```{r}
+#drop rows with same subid
+unique_fvs <- fvs %>%
+  distinct_at(vars(subid, age), .keep_all = TRUE)
+
+unique_fvs$age_round <- round(unique_fvs$age)
+
+#unique_fvs
+```
+```{r}
+age_mean <- aggregate(age_round~subid, data = unique_fvs, mean)
+
+mybreaks <- c(0, 4, 8, 12, 16, 20, 24, 28)
+ggplot(age_mean, aes(x=age_round)) + geom_histogram(aes(y=..density..), binwidth = 1, alpha=.5) +
+  geom_vline(aes(xintercept=mean(age_round)), color="red", size=1) +
+  geom_density(alpha=.2, fill="grey") +
+  labs(title="", x="Age (in month)", y="Density")+
+  theme_grey(base_size = 10) + 
+    theme_grey(base_size = 10) + 
+  theme(axis.text=element_text(size=10, color='black'), axis.title=element_text(size=12), legend.text=element_text(size=10))  + scale_x_continuous(breaks = mybreaks)
 ```
 
 Second, make a scatter plot showing hand looking as a function of age and condition. Add appropriate smoothing lines. Take the time to fix the axis labels and make the plot look nice.
 
 ```{r}
+#convert_visual_crowding <- visual_crowding %>% 
+#  convert(chr(eccentricity_deg))
+
+ggplot(fvs, aes(x=age, y=hand.look, color=condition)) +
+  geom_point() + 
+  geom_smooth(method = lm) + scale_x_continuous(breaks = mybreaks) + 
+  labs(x="Age (in month)", y="hand looking")
 ```
 
 What do you conclude from this pattern of data?
 
-> ANSWER HERE
+> As age increases, infants' looking to hands in moving screens increases, especially in the Faces-Plus condition. 
 
 What statistical analyses would you perform here to quantify these differences?
 
-> ANSWER HERE
+> Use a correlation test. 
 
+```{r}
+library("ggpubr")
+ggscatter(fvs, x = "age", y = "hand.look", color = 'condition',
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "age/month", ylab = "hand looking")
+```
 
 # Part 2: Simulation
 
@@ -55,16 +107,33 @@ What's the proportion of "significant" results ($p < .05$) that you see?
 First do this using a `for` loop.
 
 ```{r}
+count <- 0
+
+for(i in 1:10000) {
+  random_data <- rnorm(30, mean = 0, sd = 1)
+  p_value <- t.test(random_data)['p.value']
+  if (p_value < .05) {
+    count <- count + 1
+  }
+}
+
+print("The proportion of significant result is:")
+print(count/10000)
+
 ```
 
 Next, do this using the `replicate` function:
 
 ```{r}
+count_significant = replicate(10000,t.test(rnorm(30, mean = 0, sd = 1))$p.value < 0.05)
+print("The proportion of significant result is:")
+sum(count_significant )/10000
+
 ```
 
 How does this compare to the intended false-positive rate of $\alpha=0.05$?
 
-> ANSWER
+> The caculated false-positive through both methods is very identical to the intended false-positive rate. 
 
 Ok, that was a bit boring. Let's try something more interesting - let's implement a p-value sniffing simulation, in the style of Simons, Nelson, & Simonsohn (2011).
 
@@ -73,18 +142,35 @@ Consider this scenario: you have done an experiment, again with 30 participants 
 First, write a function that implements this sampling regime.
 
 ```{r}
-double.sample <- function () {
+double.sample <- function (upper_limit) {
+  base <- 30
+  p <- t.test(rnorm(base, mean = 0,sd = 1))['p.value']
+  if (is.null(upper_limit)) {
+    while (p > 0.05) {
+    base <- base + 30
+    p <- t.test(rnorm(base, mean = 0,sd = 1))['p.value']
+  }
+  }
+  else {
+  while (p > 0.05 && p < upper_limit) {
+    base <- base + 30
+    p <- t.test(rnorm(base, mean = 0,sd = 1))['p.value']
+  }
+  }
+  return (p < 0.05)
 }
 ```
 
 Now call this function 10k times and find out what happens. 
 
 ```{r}
+print("The false positive rate with an upper limit set to 0.25 is:")
+print(sum(replicate(10000, double.sample(0.25)))/10000)
 ```
 
 Is there an inflation of false positives? How bad is it?
 
-> ANSWER
+> Yes, there is an inflation of false positives. The current false positive through the double sampling method is around 0.06. 
 
 Now modify this code so that you can investigate this "double the sample" rule in a bit more depth. In the previous question, the researcher doubles the sample only when they think they got "close" to a significant result, i.e. when their not-significant p is less than 0.25. What if the researcher was more optimistic? See what happens in these 3 other scenarios:
 
@@ -98,9 +184,23 @@ HINT: Try to do this by making the function `double.sample` take the upper p val
 
 HINT 2: You may need more samples. Find out by looking at how the results change from run to run.
 
+
 ```{r}
+print("The false positive rate with an upper limit set to 0.5 is:")
+print(sum(replicate(10000, double.sample(0.5)))/10000)
+
+```
+
+```{r}
+print("The false positive rate with an upper limit set to 0.75 is:")
+print(sum(replicate(10000, double.sample(0.75)))/10000)
+```
+
+```{r}
+print("The false positive rate without an upper limit is:")
+print(sum(replicate(10000, double.sample(NULL)))/10000)
 ```
 
 What do you conclude on the basis of this simulation? How bad is this kind of data-dependent policy?
 
-> ANSWER
+> As the upper limit of the p-value increases, the false positive rate increases greatly. Imagine if a research team didn't set a upper limit of p-value before their data analysis, and they had a strong desire to get a high false positive rate so they can publish their "significant" finding. They could just double the sample size again and again until they get are the statiscal result is satisfying. I think re-registration is the key to prevent this dangerous attempt.
